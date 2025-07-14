@@ -1,28 +1,40 @@
 import Foundation
 import CoreMIDI
+import b
 
-let notes: [String: Int] = [
-    "C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4,
-    "F": 5, "F#": 6, "G": 7, "G#": 8, "A": 9,
-    "A#": 10, "B": 11
-]
+import Foundation
 
-let chords: [String: [Int]] = [
-    "Major 7th": [0, 4, 7, 11],
-    "Minor": [0, 3, 7]
-]
+// Prompt the user for folder name or use a timestamp
+func getOutputFolder() -> URL {
+    let desktopPath = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
 
-let inversions: [String: [String: [Int]]] = [
-    "Minor": [
-        "Inversion 0": [0, 3, 7],
-        "Inversion 1": [3, 7, 12],
-        "Inversion 2": [7, 12, 15]
-    ]
-]
+    print("Enter a name for the output folder (or press Enter to use a timestamp): ", terminator: "")
+    let userInput = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines)
 
-let timeValueDurations: [String: Double] = [
-    "sixteenth_note": 0.25
-]
+    let folderName: String
+    if let input = userInput, !input.isEmpty {
+        folderName = input
+    } else {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+        folderName = "music_\(formatter.string(from: Date()))"
+    }
+
+    let baseFolder = desktopPath.appendingPathComponent(folderName)
+
+    do {
+        try FileManager.default.createDirectory(at: baseFolder, withIntermediateDirectories: true)
+    } catch {
+        print("❌ Failed to create directory: \(error)")
+        exit(1)
+    }
+
+    return baseFolder
+}
+
+// Example usage:
+let baseFolder = getOutputFolder()
+print("✅ Created folder at: \(baseFolder.path)")
 
 let BARS = 32
 let BEATS_PER_BAR = 4
